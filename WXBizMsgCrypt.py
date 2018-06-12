@@ -15,11 +15,8 @@ import time
 import struct
 from Crypto.Cipher import AES
 import xml.etree.cElementTree as ET  
-import sys                                                                                                                                                                             
 import socket
-reload(sys)
 import ierror 
-sys.setdefaultencoding('utf-8') 
 
 """
 关于Crypto.Cipher模块，ImportError: No module named 'Crypto'解决方案
@@ -50,8 +47,8 @@ class SHA1:
             sha = hashlib.sha1()
             sha.update("".join(sortlist))
             return  ierror.WXBizMsgCrypt_OK, sha.hexdigest()
-        except Exception,e:
-            print e
+        except Exception as e:
+            print (e)
             return  ierror.WXBizMsgCrypt_ComputeSignature_Error, None
   
 
@@ -76,8 +73,8 @@ class XMLParse:
             encrypt  = xml_tree.find("Encrypt")
             touser_name    = xml_tree.find("ToUserName")
             return  ierror.WXBizMsgCrypt_OK, encrypt.text, touser_name.text
-        except Exception,e:
-            print e
+        except Exception as e:
+            print (e)
             return  ierror.WXBizMsgCrypt_ParseXml_Error,None,None
     
     def generate(self, encrypt, signature, timestamp, nonce):
@@ -154,8 +151,8 @@ class Prpcrypt(object):
             ciphertext = cryptor.encrypt(text)
             # 使用BASE64对加密后的字符串进行编码
             return ierror.WXBizMsgCrypt_OK, base64.b64encode(ciphertext)
-        except Exception,e:
-            print e 
+        except Exception as e:
+            print (e) 
             return  ierror.WXBizMsgCrypt_EncryptAES_Error,None
     
     def decrypt(self,text,corpid):
@@ -166,9 +163,9 @@ class Prpcrypt(object):
         try:
             cryptor = AES.new(self.key,self.mode,self.key[:16])
             # 使用BASE64对密文进行解码，然后AES-CBC解密
-            plain_text  = cryptor.decrypt(base64.b64decode(text))
-        except Exception,e:
-            print e 
+            plain_text  = cryptor.decrypt(base64.b64decode(text)).decode('utf-8')
+        except Exception as e:
+            print (e) 
             return  ierror.WXBizMsgCrypt_DecryptAES_Error,None
         try:
             pad = ord(plain_text[-1]) 
@@ -177,11 +174,11 @@ class Prpcrypt(object):
             #plain_text = pkcs7.encode(plain_text)   
             # 去除16位随机字符串
             content = plain_text[16:-pad]
-            xml_len = socket.ntohl(struct.unpack("I",content[ : 4])[0])
+            xml_len = socket.ntohl(struct.unpack("I",bytes(content[ : 4],encoding='utf-8'))[0])
             xml_content = content[4 : xml_len+4] 
             from_corpid = content[xml_len+4:]
-        except Exception,e:
-            print e
+        except Exception as e:
+            print (e)
             return  ierror.WXBizMsgCrypt_IllegalBuffer,None
         if  from_corpid != corpid:
             return ierror.WXBizMsgCrypt_ValidateCorpid_Error,None
