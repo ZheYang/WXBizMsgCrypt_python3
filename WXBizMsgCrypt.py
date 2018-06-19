@@ -150,7 +150,7 @@ class Prpcrypt(object):
         try:
             ciphertext = cryptor.encrypt(text)
             # 使用BASE64对加密后的字符串进行编码
-            return ierror.WXBizMsgCrypt_OK, base64.b64encode(ciphertext)
+            return ierror.WXBizMsgCrypt_OK, base64.b64encode(ciphertext).decode('utf-8')
         except Exception as e:
             print (e) 
             return  ierror.WXBizMsgCrypt_EncryptAES_Error,None
