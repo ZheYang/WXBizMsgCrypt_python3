@@ -188,7 +188,7 @@ class Prpcrypt(object):
         """ 随机生成16位字符串
         @return: 16位字符串
         """ 
-        rule = string.letters + string.digits
+        rule = string.ascii_letters + string.digits
         str = random.sample(rule, 16)
         return "".join(str)
         
